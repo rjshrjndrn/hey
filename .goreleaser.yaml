@@ -1,0 +1,22 @@
+# .goreleaser.yml
+project_name: hey
+release:
+  github:
+    owner: rjshrjndrn
+    name: hey
+builds:
+  - main: ./
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.appVersion={{.Version}}
+brews:
+  - name: hey
+    repository:
+      owner: rjshrjndrn
+      name: homebrew-tap
+    url_template: "https://github.com/rjshrjndrn/hey/releases/download/{{ .Tag }}/hey_{{ .Version }}_{{ .Os }}_{{ .Arch }}.tar.gz"
+    homepage: "https://github.com/rjshrjndrn/hey"
+    description: "A templating tool using helm flavoured sprig"
+    test: |
+      system "#{bin}/hey --version"
