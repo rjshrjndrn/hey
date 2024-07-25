@@ -31,8 +31,10 @@ import (
 )
 
 // Max size of the buffer of result channel.
-const maxResult = 1000000
-const maxIdleConn = 500
+const (
+	maxResult   = 1000000
+	maxIdleConn = 500
+)
 
 type result struct {
 	err           error
@@ -183,11 +185,12 @@ func (b *Work) makeRequest(c *http.Client) {
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 	resp, err := c.Do(req)
+	req.Close = true
 	if err == nil {
 		size = resp.ContentLength
 		code = resp.StatusCode
 		io.Copy(ioutil.Discard, resp.Body)
-		resp.Body.Close()
+		defer resp.Body.Close()
 	}
 	t := now()
 	resDuration = t - resStart
